@@ -4,6 +4,15 @@ export const ADMIN_COOKIE = "admin_session";
 export const ADMIN_COOKIE_VALUE = "authenticated";
 export const ADMIN_COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
+export function getAdminCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+  };
+}
+
 export function isAdminAuthenticated(): boolean {
   const cookieStore = cookies();
   return cookieStore.get(ADMIN_COOKIE)?.value === ADMIN_COOKIE_VALUE;

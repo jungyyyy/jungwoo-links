@@ -1,14 +1,19 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function AdminLoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("error") === "invalid") {
+      setError("Invalid password");
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -20,16 +25,25 @@ export default function AdminLoginForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
+        redirect: "manual",
       });
 
-      if (!res.ok) {
+      if (res.status === 401) {
         setError("Invalid password");
         return;
       }
 
-      const redirect = searchParams.get("redirect") || "/admin/dashboard";
-      router.push(redirect);
-      router.refresh();
+      if (res.status >= 300 && res.status < 400) {
+        window.location.href = "/admin";
+        return;
+      }
+
+      if (!res.ok) {
+        setError("Something went wrong");
+        return;
+      }
+
+      window.location.href = "/admin";
     } catch {
       setError("Something went wrong");
     } finally {
