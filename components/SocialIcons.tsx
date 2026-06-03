@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { Profile } from "@/lib/types";
 
 type SocialIconProps = {
@@ -6,6 +9,14 @@ type SocialIconProps = {
   children: React.ReactNode;
   isDark: boolean;
 };
+
+function iconButtonClass(isDark: boolean) {
+  return `flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
+    isDark
+      ? "bg-white/10 text-white hover:bg-white/20"
+      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+  }`;
+}
 
 function SocialIcon({ href, label, children, isDark }: SocialIconProps) {
   if (!href) return null;
@@ -16,14 +27,61 @@ function SocialIcon({ href, label, children, isDark }: SocialIconProps) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
-        isDark
-          ? "bg-white/10 text-white hover:bg-white/20"
-          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-      }`}
+      className={iconButtonClass(isDark)}
     >
       {children}
     </a>
+  );
+}
+
+function EmailCopyButton({
+  email,
+  isDark,
+}: {
+  email: string;
+  isDark: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = email;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={handleCopy}
+        aria-label={copied ? "Email copied" : "Copy email to clipboard"}
+        className={iconButtonClass(isDark)}
+      >
+        <EmailIcon />
+      </button>
+      {copied && (
+        <span
+          className={`absolute left-1/2 top-full z-10 mt-1 -translate-x-1/2 whitespace-nowrap rounded px-2 py-0.5 text-xs ${
+            isDark ? "bg-white text-gray-900" : "bg-gray-900 text-white"
+          }`}
+        >
+          Copied!
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -67,26 +125,41 @@ function TwitterIcon() {
   );
 }
 
+function EmailIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth={2}>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      />
+    </svg>
+  );
+}
+
 export function SocialIcons({ profile, isDark }: { profile: Profile; isDark: boolean }) {
-  const icons = [
+  const linkIcons = [
     { href: profile.social_tiktok, label: "TikTok", Icon: TikTokIcon },
+    { href: profile.social_youtube, label: "YouTube", Icon: YouTubeIcon },
     { href: profile.social_instagram, label: "Instagram", Icon: InstagramIcon },
     { href: profile.social_linkedin, label: "LinkedIn", Icon: LinkedInIcon },
-    { href: profile.social_youtube, label: "YouTube", Icon: YouTubeIcon },
     { href: profile.social_twitter, label: "Twitter/X", Icon: TwitterIcon },
   ];
 
-  const visibleIcons = icons.filter((i) => i.href);
+  const visibleLinks = linkIcons.filter((i) => i.href);
+  const email = profile.social_email?.trim();
+  const hasAny = visibleLinks.length > 0 || !!email;
 
-  if (visibleIcons.length === 0) return null;
+  if (!hasAny) return null;
 
   return (
-    <div className="mt-4 flex items-center justify-center gap-3">
-      {visibleIcons.map(({ href, label, Icon }) => (
+    <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+      {visibleLinks.map(({ href, label, Icon }) => (
         <SocialIcon key={label} href={href} label={label} isDark={isDark}>
           <Icon />
         </SocialIcon>
       ))}
+      {email && <EmailCopyButton email={email} isDark={isDark} />}
     </div>
   );
 }

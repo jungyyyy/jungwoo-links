@@ -1,4 +1,5 @@
 import { PublicPage } from "@/components/PublicPage";
+import { applySocialDefaults } from "@/lib/social-defaults";
 import { createAdminClient } from "@/lib/supabase/server";
 import { DEFAULT_PROFILE } from "@/lib/supabase/setup";
 import type { Link, Profile, Section } from "@/lib/types";
@@ -22,7 +23,9 @@ async function getPageData(): Promise<{
       .order("order_index", { ascending: true }),
   ]);
 
-  const profile = (profileRes.data as Profile) || DEFAULT_PROFILE;
+  const profile = applySocialDefaults(
+    (profileRes.data as Profile) || DEFAULT_PROFILE
+  );
   const sections = (sectionsRes.data || []) as Section[];
   const links = (linksRes.data || []) as Link[];
 

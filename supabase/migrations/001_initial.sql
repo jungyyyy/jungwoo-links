@@ -9,7 +9,8 @@ CREATE TABLE profile (
   social_instagram TEXT NOT NULL DEFAULT '',
   social_linkedin TEXT NOT NULL DEFAULT '',
   social_youtube TEXT NOT NULL DEFAULT '',
-  social_twitter TEXT NOT NULL DEFAULT ''
+  social_twitter TEXT NOT NULL DEFAULT '',
+  social_email TEXT NOT NULL DEFAULT ''
 );
 
 -- Sections table

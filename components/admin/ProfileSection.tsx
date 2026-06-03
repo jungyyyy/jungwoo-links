@@ -175,19 +175,23 @@ export function ProfileSection() {
       <div className="rounded-xl border border-gray-200 bg-white p-6 space-y-4">
         <h2 className="text-base font-semibold text-gray-900">Social Links</h2>
 
-        {SOCIAL_PLATFORMS.map(({ key, label }) => (
+        {SOCIAL_PLATFORMS.map(({ key, label, inputType }) => (
           <div key={key}>
             <label className="mb-1 block text-sm font-medium text-gray-700">
               {label}
             </label>
             <input
-              type="url"
-              value={profile[key]}
+              type={inputType ?? "url"}
+              value={profile[key] ?? ""}
               onChange={(e) =>
                 setProfile({ ...profile, [key]: e.target.value })
               }
               className="admin-input"
-              placeholder={`https://${label.toLowerCase()}.com/...`}
+              placeholder={
+                inputType === "email"
+                  ? "you@example.com"
+                  : `https://${label.toLowerCase()}.com/...`
+              }
             />
           </div>
         ))}

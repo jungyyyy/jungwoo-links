@@ -9,6 +9,7 @@ export type Profile = {
   social_linkedin: string;
   social_youtube: string;
   social_twitter: string;
+  social_email: string;
 };
 
 export type Section = {
@@ -48,7 +49,8 @@ export type SocialPlatform =
   | "instagram"
   | "linkedin"
   | "youtube"
-  | "twitter";
+  | "twitter"
+  | "email";
 
 export const SOCIAL_PLATFORMS: {
   key: keyof Pick<
@@ -58,13 +60,16 @@ export const SOCIAL_PLATFORMS: {
     | "social_linkedin"
     | "social_youtube"
     | "social_twitter"
+    | "social_email"
   >;
   label: string;
   icon: string;
+  inputType?: "url" | "email";
 }[] = [
   { key: "social_tiktok", label: "TikTok", icon: "tiktok" },
+  { key: "social_youtube", label: "YouTube", icon: "youtube" },
   { key: "social_instagram", label: "Instagram", icon: "instagram" },
   { key: "social_linkedin", label: "LinkedIn", icon: "linkedin" },
-  { key: "social_youtube", label: "YouTube", icon: "youtube" },
+  { key: "social_email", label: "Email", icon: "email", inputType: "email" },
   { key: "social_twitter", label: "Twitter/X", icon: "twitter" },
 ];

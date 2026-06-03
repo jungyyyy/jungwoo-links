@@ -7,11 +7,12 @@ export const DEFAULT_PROFILE: Profile = {
   bio: "Welcome to my links",
   photo_url: "",
   theme: "dark",
-  social_tiktok: "",
-  social_instagram: "",
-  social_linkedin: "",
-  social_youtube: "",
+  social_tiktok: "https://www.tiktok.com/@growjungwoo",
+  social_instagram: "https://www.instagram.com/growjungwoo",
+  social_linkedin: "https://www.linkedin.com/in/jung-woo-lee-9131901a8/",
+  social_youtube: "https://www.youtube.com/@growjungwoo",
   social_twitter: "",
+  social_email: "jungwoolee6973@gmail.com",
 };
 
 export async function ensureProfile(): Promise<Profile> {

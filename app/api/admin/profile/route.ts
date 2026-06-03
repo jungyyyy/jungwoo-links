@@ -41,6 +41,7 @@ export async function PUT(request: Request) {
           social_linkedin: body.social_linkedin,
           social_youtube: body.social_youtube,
           social_twitter: body.social_twitter,
+          social_email: body.social_email,
         },
         { onConflict: "id" }
       )
