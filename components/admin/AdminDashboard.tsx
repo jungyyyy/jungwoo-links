@@ -29,13 +29,15 @@ export function AdminDashboard() {
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
           <h1 className="text-lg font-semibold text-gray-900">Admin Dashboard</h1>
           <div className="flex items-center gap-3">
-            <a
-              href="/"
-              target="_blank"
+            <button
+              type="button"
+              onClick={() =>
+                window.open(`/?t=${Date.now()}`, "_blank", "noopener,noreferrer")
+              }
               className="text-sm text-indigo-600 hover:text-indigo-700"
             >
               View site
-            </a>
+            </button>
             <button
               onClick={handleLogout}
               className="admin-btn-secondary text-sm"

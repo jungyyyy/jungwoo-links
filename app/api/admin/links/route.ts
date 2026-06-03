@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
+import { revalidatePublicSite } from "@/lib/revalidate-public";
 import { createAdminClient } from "@/lib/supabase/server";
 
 export async function GET() {
@@ -70,6 +71,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  revalidatePublicSite();
   return NextResponse.json(data);
 }
 
@@ -95,6 +97,7 @@ export async function PUT(request: Request) {
       }
     }
 
+    revalidatePublicSite();
     return NextResponse.json({ success: true });
   }
 
@@ -130,6 +133,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  revalidatePublicSite();
   return NextResponse.json(data);
 }
 
@@ -152,5 +156,6 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  revalidatePublicSite();
   return NextResponse.json({ success: true });
 }

@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from "next/cache";
 import { PublicPage } from "@/components/PublicPage";
 import { applySocialDefaults } from "@/lib/social-defaults";
 import { createAdminClient } from "@/lib/supabase/server";
@@ -5,12 +6,15 @@ import { DEFAULT_PROFILE } from "@/lib/supabase/setup";
 import type { Link, Profile, Section } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 async function getPageData(): Promise<{
   profile: Profile;
   sections: Section[];
   links: Link[];
 }> {
+  noStore();
   const supabase = createAdminClient();
 
   const [profileRes, sectionsRes, linksRes] = await Promise.all([

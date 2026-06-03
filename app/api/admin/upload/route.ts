@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
+import { revalidatePublicSite } from "@/lib/revalidate-public";
 import { createAdminClient } from "@/lib/supabase/server";
 import { ensureAvatarsBucket } from "@/lib/supabase/setup";
 
@@ -40,7 +41,8 @@ export async function POST(request: Request) {
 
     const { data, error } = await supabase
       .from("profile")
-      .upsert({ id: 1, photo_url: publicUrl }, { onConflict: "id" })
+      .update({ photo_url: publicUrl })
+      .eq("id", 1)
       .select()
       .single();
 
@@ -48,6 +50,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    revalidatePublicSite();
     return NextResponse.json(data);
   } catch (error) {
     const message =

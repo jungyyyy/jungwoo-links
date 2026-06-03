@@ -10,6 +10,8 @@ export function ProfileSection() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  const [migrationSql, setMigrationSql] = useState("");
+  const [needsEmailMigration, setNeedsEmailMigration] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -19,10 +21,19 @@ export function ProfileSection() {
         if (!r.ok) {
           throw new Error(data.error || "Failed to load profile");
         }
-        return data as Profile;
+        const { _schema, _warning, _migrationSql, ...profile } = data;
+        return {
+          profile: profile as Profile,
+          hasSocialEmailColumn: _schema?.hasSocialEmailColumn !== false,
+          warning: _warning as string | undefined,
+          sql: _migrationSql as string | undefined,
+        };
       })
-      .then((data) => {
-        setProfile(data);
+      .then(({ profile, hasSocialEmailColumn, warning, sql }) => {
+        setProfile(profile);
+        setNeedsEmailMigration(!hasSocialEmailColumn);
+        if (warning) setMessage(warning);
+        if (sql) setMigrationSql(sql);
         setLoading(false);
       })
       .catch((err: Error) => {
@@ -42,10 +53,15 @@ export function ProfileSection() {
       body: JSON.stringify(profile),
     });
 
+    const data = await res.json();
+
     if (res.ok) {
-      setMessage("Profile saved!");
+      const { _schema, _warning, _migrationSql, ...saved } = data;
+      setProfile(saved as Profile);
+      setNeedsEmailMigration(_schema?.hasSocialEmailColumn === false);
+      setMigrationSql(_migrationSql || "");
+      setMessage(_warning || "Profile saved!");
     } else {
-      const data = await res.json();
       setMessage(data.error || "Failed to save profile");
     }
     setSaving(false);
@@ -172,6 +188,19 @@ export function ProfileSection() {
         </div>
       </div>
 
+      {needsEmailMigration && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <p className="font-medium">One-time database update required for email</p>
+          <p className="mt-1 text-amber-800">
+            Open Supabase → SQL Editor, run this, then save profile again:
+          </p>
+          <pre className="mt-2 overflow-x-auto rounded bg-white p-2 text-xs text-gray-800">
+            {migrationSql ||
+              "ALTER TABLE profile ADD COLUMN IF NOT EXISTS social_email TEXT NOT NULL DEFAULT '';"}
+          </pre>
+        </div>
+      )}
+
       <div className="rounded-xl border border-gray-200 bg-white p-6 space-y-4">
         <h2 className="text-base font-semibold text-gray-900">Social Links</h2>
 
@@ -208,9 +237,12 @@ export function ProfileSection() {
         {message && (
           <span
             className={`text-sm ${
-              message.includes("Failed") || message.includes("error")
+              message.includes("Failed") ||
+              message.toLowerCase().includes("error")
                 ? "text-red-600"
-                : "text-gray-600"
+                : message.includes("could not be stored")
+                  ? "text-amber-700"
+                  : "text-gray-600"
             }`}
           >
             {message}

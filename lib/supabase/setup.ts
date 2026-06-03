@@ -1,4 +1,5 @@
 import type { Profile } from "@/lib/types";
+import { buildProfileUpsertRow, profileHasSocialEmailColumn } from "./profile-schema";
 import { createAdminClient } from "./server";
 
 export const DEFAULT_PROFILE: Profile = {
@@ -28,9 +29,10 @@ export async function ensureProfile(): Promise<Profile> {
     return existing as Profile;
   }
 
+  const hasSocialEmailColumn = await profileHasSocialEmailColumn(supabase);
   const { data: created, error } = await supabase
     .from("profile")
-    .insert(DEFAULT_PROFILE)
+    .insert(buildProfileUpsertRow(DEFAULT_PROFILE, hasSocialEmailColumn))
     .select()
     .single();
 
