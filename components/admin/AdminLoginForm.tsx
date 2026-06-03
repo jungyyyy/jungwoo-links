@@ -25,27 +25,26 @@ export default function AdminLoginForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
-        redirect: "manual",
+        credentials: "same-origin",
       });
+
+      const data = await res.json().catch(() => ({}));
 
       if (res.status === 401) {
         setError("Invalid password");
         return;
       }
 
-      if (res.status >= 300 && res.status < 400) {
-        window.location.href = "/admin";
-        return;
-      }
-
       if (!res.ok) {
-        setError("Something went wrong");
+        setError(
+          typeof data.error === "string" ? data.error : "Something went wrong"
+        );
         return;
       }
 
       window.location.href = "/admin";
     } catch {
-      setError("Something went wrong");
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

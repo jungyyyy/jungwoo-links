@@ -19,7 +19,7 @@ export function isAdminAuthenticated(): boolean {
 }
 
 export function verifyAdminPassword(password: string): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminPassword = process.env.ADMIN_PASSWORD?.trim();
   if (!adminPassword) return false;
-  return password === adminPassword;
+  return password.trim() === adminPassword;
 }
